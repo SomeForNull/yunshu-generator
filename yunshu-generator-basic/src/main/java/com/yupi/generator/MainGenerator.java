@@ -1,6 +1,4 @@
 package com.yupi.generator;
-
-import com.yupi.model.MainTemplateConfig;
 import freemarker.template.TemplateException;
 
 import java.io.File;
@@ -10,7 +8,8 @@ import java.io.IOException;
  *
  */
 public class MainGenerator {
-    public static void main(String[] args) throws TemplateException, IOException {
+
+    public static void doGenerator(Object model) throws IOException, TemplateException {
         //1.静态文件生成
         String projectPath = System.getProperty("user.dir");
         System.out.println(projectPath);
@@ -22,13 +21,9 @@ public class MainGenerator {
         StaticGenerator.copyFilesByRecursive(inputPath,outputPath);
 
         //2.动态文件生成
-
         String dynamicInputPath=projectPath+File.separator+"yunshu-generator-basic"+File.separator+"src/main/resources/templates/MainTemplate.java.ftl";
         String dynamicOutputPath=projectPath+File.separator+"acm-template/src/com/yupi/acm/MainTemplate.java";
-        MainTemplateConfig mainTemplateConfig = new MainTemplateConfig();
-        mainTemplateConfig.setAuthor("云舒");
-        mainTemplateConfig.setOutputText("我的输出结果：");
-        mainTemplateConfig.setLoop(true);
-        DynamicGenerator.doGenerator(dynamicInputPath,dynamicOutputPath,mainTemplateConfig);
+
+        DynamicGenerator.doGenerator(dynamicInputPath,dynamicOutputPath,model);
     }
 }
