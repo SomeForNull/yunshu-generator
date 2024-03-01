@@ -63,8 +63,6 @@ public class StaticGenerator {
     public static void copyFileByRecursive(File inputFile,File outputFile) throws IOException {
             //区分是文件还是目录
             if(inputFile.isDirectory()){
-                System.out.println(inputFile.getName());
-                System.out.println(inputFile.length());
                 File destOutputFile=new File(outputFile,inputFile.getName());
                 //如果是目录，首先创建目录
                 if(!destOutputFile.exists()){
@@ -83,7 +81,7 @@ public class StaticGenerator {
             }else
             //不是目录直接复制
             {
-                Path destPath = outputFile.toPath().resolve(inputFile.getName());
+                Path destPath = outputFile.toPath().resolve(inputFile.getName());//resolve 路径连接
                 Files.copy(inputFile.toPath(),destPath, StandardCopyOption.REPLACE_EXISTING);
             }
     }

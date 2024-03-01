@@ -38,7 +38,7 @@ public class DynamicGenerator {
         //  new出Configuration对象，参数为FreeMarker版本号。
         Configuration cfg = new Configuration(Configuration.VERSION_2_3_22);
 
-          File templateDir=new File(inputPath).getParentFile();
+        File templateDir=new File(inputPath).getParentFile();
         // 指定模板文件所在的路径
         cfg.setDirectoryForTemplateLoading(templateDir);
 
