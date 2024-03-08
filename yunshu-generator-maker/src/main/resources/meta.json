@@ -1,7 +1,7 @@
 {
   "name": "acm-template-pro-generator",
   "description": "ACM 示例模板生成器",
-  "basePackage": "com.yupi",
+  "basePackage": "com.yunshu",
   "version": "1.0",
   "author": "yunshu",
   "createTime": "2024-03-01",

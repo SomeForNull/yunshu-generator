@@ -24,6 +24,7 @@ public class FileGenerator {
         String dynamicInputPath=projectPath+File.separator+"yunshu-generator-maker"+File.separator+"src/main/resources/templates/MainTemplate.java.ftl";
         String dynamicOutputPath=projectPath+File.separator+"acm-template/src/com/yupi/acm/MainTemplate.java";
 
-        DynamicFileGenerator.doGenerator(dynamicInputPath,dynamicOutputPath,model);
+        DynamicFileGenerator.doGenerate(dynamicInputPath,dynamicOutputPath,model);
+
     }
 }

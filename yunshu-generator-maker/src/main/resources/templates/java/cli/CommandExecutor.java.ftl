@@ -1,11 +1,11 @@
-package com.yupi.maker.cli;
+package ${basePackage}.cli;
 
-import com.yupi.maker.cli.command.ConfigCommand;
-import com.yupi.maker.cli.command.GenerateCommand;
-import com.yupi.maker.cli.command.ListCommand;
+import ${basePackage}.cli.command.ConfigCommand;
+import ${basePackage}.cli.command.GenerateCommand;
+import ${basePackage}.cli.command.ListCommand;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
-@Command(name = "yunshu",mixinStandardHelpOptions = true)
+@Command(name = "${name}",mixinStandardHelpOptions = true)
 public class CommandExecutor implements Runnable{
     private final CommandLine commandLine;
     {
@@ -13,6 +13,7 @@ public class CommandExecutor implements Runnable{
                 .addSubcommand(new GenerateCommand())
                 .addSubcommand(new ConfigCommand())
                 .addSubcommand(new ListCommand());
+    }
     }
 
     @Override

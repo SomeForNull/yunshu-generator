@@ -1,11 +1,9 @@
 package com.yupi.maker.generator.file;
 
 import cn.hutool.core.io.FileUtil;
-import com.yupi.maker.model.DataModel;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -23,7 +21,7 @@ public class DynamicFileGenerator {
      * @throws IOException
      * @throws TemplateException
      */
-    public static void doGenerator(String inputPath,String outputPath,Object model) throws IOException, TemplateException {
+    public static void doGenerate(String inputPath,String outputPath,Object model) throws IOException, TemplateException {
         //  new出Configuration对象，参数为FreeMarker版本号。
         Configuration cfg = new Configuration(Configuration.VERSION_2_3_22);
 

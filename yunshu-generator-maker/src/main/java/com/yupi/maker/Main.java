@@ -1,7 +1,4 @@
 package com.yupi.maker;
-
-import com.yupi.maker.cli.CommandExecutor;
-
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
@@ -10,7 +7,7 @@ public class Main {
         //args=new String[]{"yunshu","--help"};
         //args=new String[]{"list"};
         //args=new String[]{"config"};
-        CommandExecutor commandExecutor = new CommandExecutor();
-        commandExecutor.doExecutor(args);
+        //CommandExecutor commandExecutor = new CommandExecutor();
+        //commandExecutor.doExecutor(args);
     }
 }
