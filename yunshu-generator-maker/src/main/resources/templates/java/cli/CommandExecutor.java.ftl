@@ -14,7 +14,7 @@ public class CommandExecutor implements Runnable{
                 .addSubcommand(new ConfigCommand())
                 .addSubcommand(new ListCommand());
     }
-    }
+
 
     @Override
     public void run() {

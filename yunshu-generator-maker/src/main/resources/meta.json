@@ -6,7 +6,7 @@
   "author": "yunshu",
   "createTime": "2024-03-01",
   "fileConfig": {
-    "inputRootPath": "/Users/yupi/Code/yuzi-generator/yuzi-generator-demo-projects/acm-template-pro",
+    "inputRootPath": "D:/javaideaproject/yunshu-generator/yunshu-generator-demo-projects/acm-template",
     "outputRootPath": "generated",
     "type": "dir",
     "files": [

@@ -10,10 +10,6 @@ import java.io.IOException;
 public class MainGenerator {
 
     public static void doGenerator(Object model) throws IOException, TemplateException {
-
-
-
-
         //1.静态文件生成
         String projectPath = System.getProperty("user.dir");
         System.out.println(projectPath);

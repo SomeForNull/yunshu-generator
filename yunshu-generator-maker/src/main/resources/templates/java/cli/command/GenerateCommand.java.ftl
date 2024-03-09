@@ -1,7 +1,7 @@
 package ${basePackage}.cli.command;
 
 import cn.hutool.core.bean.BeanUtil;
-import ${basePackage}.generator.file.FileGenerator;
+import ${basePackage}.generator.MainGenerator;
 import ${basePackage}.model.DataModel;
 import freemarker.template.TemplateException;
 import lombok.Data;
@@ -23,7 +23,7 @@ public class GenerateCommand implements Callable<Integer> {
     public Integer call() throws TemplateException, IOException {
         DataModel dataModel = new DataModel();
         BeanUtil.copyProperties(this, dataModel);
-        FileGenerator.doGenerator(dataModel);
+        MainGenerator.doGenerate(dataModel);
         return 0;
     }
 }
