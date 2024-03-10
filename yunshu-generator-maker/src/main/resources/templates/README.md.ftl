@@ -4,7 +4,7 @@
 >
 > 作者：${author}
 >
-> 基于 yunshu 的 [云舒代码生成器项目](https://github.com) 制作，感谢您的使用！
+> 基于 yunshu 的 [云舒代码生成器项目](https://github.com/SomeForNull/yunshu-generator) 制作，感谢您的使用！
 
 可以通过命令行交互式输入的方式动态生成想要的项目代码
 
