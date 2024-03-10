@@ -17,7 +17,7 @@ public class MainGenerator {
         System.out.println(meta);
         //输出的根路径
         String projectPath=System.getProperty("user.dir");
-        String outputPath=projectPath+ File.separator+"generator"+File.separator+meta.getName();
+        String outputPath=projectPath+ File.separator+"generated"+File.separator+meta.getName();
         if(!FileUtil.exist(outputPath)){
             FileUtil.mkdir(outputPath);
         }
