@@ -4,7 +4,7 @@
 yunshu-generator.iml
 yunshu-generator-basic.iml
 out
-
+generate
 ### Java template
 # Compiled class file
 *.class

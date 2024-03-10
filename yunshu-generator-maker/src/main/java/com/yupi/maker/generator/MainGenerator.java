@@ -17,10 +17,14 @@ public class MainGenerator {
         System.out.println(meta);
         //输出的根路径
         String projectPath=System.getProperty("user.dir");
-        String outputPath=projectPath+ File.separator+"generator";
+        String outputPath=projectPath+ File.separator+"generator"+File.separator+meta.getName();
         if(!FileUtil.exist(outputPath)){
             FileUtil.mkdir(outputPath);
         }
+        //从原始文件复制到生成的代码中
+        String sourceRootPath=meta.getFileConfig().getSourceRootPath();
+        String sourceCopyPath=outputPath+File.separator+".source";
+        FileUtil.copy(sourceRootPath,sourceCopyPath,false);
         //读取resource目录
         ClassPathResource classPathResource = new ClassPathResource("");
         String inputResourcePath = classPathResource.getAbsolutePath();
