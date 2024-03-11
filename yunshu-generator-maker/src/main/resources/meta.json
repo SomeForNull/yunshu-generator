@@ -6,8 +6,6 @@
   "author": "yunshu",
   "createTime": "2024-03-01",
   "fileConfig": {
-    "inputRootPath": ".source/acm-template",
-    "outputRootPath": "generated",
     "sourceRootPath": "D:/javaideaproject/yunshu-generator/yunshu-generator-demo-projects/acm-template",
     "type": "dir",
     "files": [
