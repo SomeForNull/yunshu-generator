@@ -1,6 +1,7 @@
 ### Custom Template
 
 .idea
+.temp
 yunshu-generator.iml
 yunshu-generator-basic.iml
 out
