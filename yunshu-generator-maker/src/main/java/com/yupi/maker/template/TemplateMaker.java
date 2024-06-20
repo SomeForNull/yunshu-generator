@@ -19,15 +19,13 @@ import java.util.stream.Collectors;
  * 模板制作工具
  */
 public class TemplateMaker {
-    private static long makeTemplate(Long id) {
+    private static long makeTemplate(String originalProjectPath, String fileInputPath, String searchStr,Meta meta, Meta.ModelConfig.ModelInfo modelInfo, Long id) {
         // 没有 id 则生成
         if (id == null) {
             id = IdUtil.getSnowflakeNextId();
         }
 
-        //指定原始项目路径
-        String projectPath = System.getProperty("user.dir");
-        String originalProjectPath = new File(projectPath).getParent() + File.separator + "yunshu-generator-demo-projects/acm-template";
+       String projectPath = System.getProperty("user.dir");
         // 复制目录
         String tempDirPath = projectPath + File.separator + ".temp";
 
@@ -40,25 +38,18 @@ public class TemplateMaker {
 
 
         //一、输入信息
-        //1、项目的基本信息
-        String name = "acm-template-pro-generator";
-        String description = "ACM 示例模板生成器";
+
         //2、输入文件信息
 
         //要挖坑的根目录
         String sourceRootPath = templatePath + File.separator + FileUtil.getLastPathEle(Paths.get(originalProjectPath)).toString();
         sourceRootPath = sourceRootPath.replaceAll("\\\\", "/");
-        //要挖坑的文件
-        String fileInputPath = "src/com/yupi/acm/MainTemplate.java";
+
 
         //要输出的文件
         String fileOutputPath = fileInputPath + ".ftl";
 
-        //3、输入模型参数信息
-        Meta.ModelConfig.ModelInfo modelInfo = new Meta.ModelConfig.ModelInfo();
-        modelInfo.setFieldName("outputText");
-        modelInfo.setType("String");
-        modelInfo.setDefaultValue("Sum: ");
+
 
         //二、使用字符串替换，生成模板文件
         String fileInputAbsolutePath = sourceRootPath + File.separator + fileInputPath;
@@ -70,7 +61,7 @@ public class TemplateMaker {
         }
 
         String replacement = String.format("${%s}", modelInfo.getFieldName());
-        String newContent = StrUtil.replace(fileContent, "Sum: ", replacement);
+        String newContent = StrUtil.replace(fileContent, searchStr, replacement);
 
         //输出模板文件
 
@@ -102,9 +93,6 @@ public class TemplateMaker {
             FileUtil.writeUtf8String(JSONUtil.toJsonPrettyStr(oldMeta), metaPath);
         } else {
             //1.构造配置参数对象
-            Meta meta = new Meta();
-            meta.setName(name);
-            meta.setDescription(description);
 
             Meta.FileConfig fileConfig = new Meta.FileConfig();
             meta.setFileConfig(fileConfig);
@@ -159,8 +147,30 @@ public class TemplateMaker {
     }
 
     public static void main(String[] args) {
-
-        TemplateMaker.makeTemplate(1803405813415804928L);
+        //指定原始项目路径
+        String projectPath = System.getProperty("user.dir");
+        String originalProjectPath = new File(projectPath).getParent() + File.separator + "yunshu-generator-demo-projects/acm-template";
+        //1、项目的基本信息
+        Meta meta = new Meta();
+        meta.setName( "acm-template-pro-generator");
+        meta.setDescription("ACM 示例模板生成器");
+        //要挖坑的文件
+        String fileInputPath = "src/com/yupi/acm/MainTemplate.java";
+        //3、输入模型参数信息
+        //3.1第一次制作
+/*        Meta.ModelConfig.ModelInfo modelInfo = new Meta.ModelConfig.ModelInfo();
+        modelInfo.setFieldName("outputText");
+        modelInfo.setType("String");*/
+        //3.2第二次制作
+        Meta.ModelConfig.ModelInfo modelInfo = new Meta.ModelConfig.ModelInfo();
+        modelInfo.setFieldName("className");
+        modelInfo.setType("String");
+        //替换的字符串
+        //第一次替换
+//        String searchStr = "Sum: ";
+        //第二次替换
+        String searchStr = "MainTemplate";
+        TemplateMaker.makeTemplate(originalProjectPath,fileInputPath,searchStr,meta,modelInfo,1803405813415804928L);
     }
 
 }
