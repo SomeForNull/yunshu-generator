@@ -11,6 +11,7 @@ import com.yupi.maker.meta.enums.FileTypeEnum;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 import java.util.stream.Collectors;
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
  * 模板制作工具
  */
 public class TemplateMaker {
-    private static long makeTemplate(String originalProjectPath, String fileInputPath, String searchStr,Meta meta, Meta.ModelConfig.ModelInfo modelInfo, Long id) {
+    private static long makeTemplate(String originalProjectPath, List<String> fileInputPathList, String searchStr,Meta meta, Meta.ModelConfig.ModelInfo modelInfo, Long id) {
         // 没有 id 则生成
         if (id == null) {
             id = IdUtil.getSnowflakeNextId();
@@ -43,21 +44,24 @@ public class TemplateMaker {
 
         //要挖坑的根目录
         String sourceRootPath = templatePath + File.separator + FileUtil.getLastPathEle(Paths.get(originalProjectPath)).toString();
+
         sourceRootPath = sourceRootPath.replaceAll("\\\\", "/");
-        String inputFileAbsolutePath = sourceRootPath + File.separator + fileInputPath;
+        //支持遍历多个文件
         List<Meta.FileConfig.FileInfo> newFileInfos = new ArrayList<>();
-        if(FileUtil.isDirectory(inputFileAbsolutePath)){
-            List<File> fileList = FileUtil.loopFiles(inputFileAbsolutePath);
-            for (File file : fileList) {
-                Meta.FileConfig.FileInfo fileInfo = makeFileTemplate(searchStr, modelInfo, file,sourceRootPath);
+        for (String fileInputPath : fileInputPathList) {
+            String inputFileAbsolutePath = sourceRootPath + File.separator + fileInputPath;
+            if(FileUtil.isDirectory(inputFileAbsolutePath)){
+                List<File> fileList = FileUtil.loopFiles(inputFileAbsolutePath);
+                for (File file : fileList) {
+                    Meta.FileConfig.FileInfo fileInfo = makeFileTemplate(searchStr, modelInfo, file,sourceRootPath);
+                    newFileInfos.add(fileInfo);
+                }
+            }
+            else {
+                Meta.FileConfig.FileInfo fileInfo = makeFileTemplate(searchStr, modelInfo, new File(inputFileAbsolutePath),sourceRootPath);
                 newFileInfos.add(fileInfo);
             }
         }
-        else {
-            Meta.FileConfig.FileInfo fileInfo = makeFileTemplate(searchStr, modelInfo, new File(inputFileAbsolutePath),sourceRootPath);
-            newFileInfos.add(fileInfo);
-        }
-
 
 
         //三、生成配置文件
@@ -108,7 +112,7 @@ public class TemplateMaker {
     }
 
     private static Meta.FileConfig.FileInfo makeFileTemplate(String searchStr, Meta.ModelConfig.ModelInfo modelInfo, File inputFilePath,String sourceRootPath) {
-        String fileInputPath = inputFilePath.getAbsolutePath().replace(sourceRootPath+"/","");
+        String fileInputPath = inputFilePath.getAbsolutePath().replaceAll("\\\\","/").replace(sourceRootPath+"/","");
 
         //要输出的文件
         String fileOutputPath = fileInputPath + ".ftl";
@@ -125,9 +129,7 @@ public class TemplateMaker {
         String replacement = String.format("${%s}", modelInfo.getFieldName());
         String newContent = StrUtil.replace(fileContent, searchStr, replacement);
 
-        //输出模板文件
 
-        FileUtil.writeUtf8String(newContent, fileOutputAbsolutePath);
 
         //文件配置信息
         Meta.FileConfig.FileInfo fileInfo = new Meta.FileConfig.FileInfo();
@@ -135,6 +137,17 @@ public class TemplateMaker {
         fileInfo.setOutputPath(fileOutputPath);
         fileInfo.setType(FileTypeEnum.File.getValue());
         fileInfo.setGenerateType(FileGenerateTypeEnum.DYNAMIC.getValue());
+        // 和原文件一致，没有挖坑，则为静态生成
+        if (newContent.equals(fileContent)) {
+            // 输出路径 = 输入路径
+            fileInfo.setOutputPath(fileInputPath);
+            fileInfo.setGenerateType(FileGenerateTypeEnum.STATIC.getValue());
+        } else {
+            // 生成模板文件
+            fileInfo.setGenerateType(FileGenerateTypeEnum.DYNAMIC.getValue());
+            //输出模板文件
+            FileUtil.writeUtf8String(newContent, fileOutputAbsolutePath);
+        }
         return fileInfo;
     }
 
@@ -166,13 +179,14 @@ public class TemplateMaker {
     public static void main(String[] args) {
         //指定原始项目路径
         String projectPath = System.getProperty("user.dir");
-        String originalProjectPath = new File(projectPath).getParent() + File.separator + "yunshu-generator-demo-projects/acm-template";
+        String originalProjectPath = new File(projectPath).getParent() + File.separator + "yunshu-generator-demo-projects/springboot-init";
         //1、项目的基本信息
         Meta meta = new Meta();
         meta.setName( "acm-template-pro-generator");
         meta.setDescription("ACM 示例模板生成器");
         //要挖坑的文件
-        String fileInputPath = "src/com/yupi/acm/MainTemplate.java";
+        String fileInputPath1 = "src/main/java/com/yupi/springbootinit/common";
+        String fileInputPath2 = "src/main/java/com/yupi/springbootinit/controller";
         //3、输入模型参数信息
         //3.1第一次制作
 /*        Meta.ModelConfig.ModelInfo modelInfo = new Meta.ModelConfig.ModelInfo();
@@ -186,8 +200,8 @@ public class TemplateMaker {
         //第一次替换
 //        String searchStr = "Sum: ";
         //第二次替换
-        String searchStr = "MainTemplate";
-        TemplateMaker.makeTemplate(originalProjectPath,fileInputPath,searchStr,meta,modelInfo,1803405813415804928L);
+        String searchStr = "BaseResponse";
+        TemplateMaker.makeTemplate(originalProjectPath, Arrays.asList(fileInputPath1,fileInputPath2),searchStr,meta,modelInfo,1803405813415804928L);
     }
 
 }
