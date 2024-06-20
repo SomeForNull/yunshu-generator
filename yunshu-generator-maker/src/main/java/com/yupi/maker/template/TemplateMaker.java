@@ -44,35 +44,21 @@ public class TemplateMaker {
         //要挖坑的根目录
         String sourceRootPath = templatePath + File.separator + FileUtil.getLastPathEle(Paths.get(originalProjectPath)).toString();
         sourceRootPath = sourceRootPath.replaceAll("\\\\", "/");
-
-
-        //要输出的文件
-        String fileOutputPath = fileInputPath + ".ftl";
-
-
-
-        //二、使用字符串替换，生成模板文件
-        String fileInputAbsolutePath = sourceRootPath + File.separator + fileInputPath;
-        String fileOutputAbsolutePath = sourceRootPath + File.separator + fileOutputPath;
-        String fileContent = FileUtil.readUtf8String(fileInputAbsolutePath);
-        //如果已有模板文件，表示不是第一次制作，则在原有模板文件上修改
-        if (FileUtil.exist(fileOutputAbsolutePath)) {
-            fileContent = FileUtil.readUtf8String(fileOutputAbsolutePath);
+        String inputFileAbsolutePath = sourceRootPath + File.separator + fileInputPath;
+        List<Meta.FileConfig.FileInfo> newFileInfos = new ArrayList<>();
+        if(FileUtil.isDirectory(inputFileAbsolutePath)){
+            List<File> fileList = FileUtil.loopFiles(inputFileAbsolutePath);
+            for (File file : fileList) {
+                Meta.FileConfig.FileInfo fileInfo = makeFileTemplate(searchStr, modelInfo, file,sourceRootPath);
+                newFileInfos.add(fileInfo);
+            }
+        }
+        else {
+            Meta.FileConfig.FileInfo fileInfo = makeFileTemplate(searchStr, modelInfo, new File(inputFileAbsolutePath),sourceRootPath);
+            newFileInfos.add(fileInfo);
         }
 
-        String replacement = String.format("${%s}", modelInfo.getFieldName());
-        String newContent = StrUtil.replace(fileContent, searchStr, replacement);
 
-        //输出模板文件
-
-        FileUtil.writeUtf8String(newContent, fileOutputAbsolutePath);
-
-        //文件配置信息
-        Meta.FileConfig.FileInfo fileInfo = new Meta.FileConfig.FileInfo();
-        fileInfo.setInputPath(fileInputPath);
-        fileInfo.setOutputPath(fileOutputPath);
-        fileInfo.setType(FileTypeEnum.File.getValue());
-        fileInfo.setGenerateType(FileGenerateTypeEnum.DYNAMIC.getValue());
 
         //三、生成配置文件
         String metaPath = sourceRootPath + File.separator + "meta.json";
@@ -81,7 +67,7 @@ public class TemplateMaker {
             Meta oldMeta = JSONUtil.toBean(FileUtil.readUtf8String(metaPath), Meta.class);
             //1.追加配置参数
             List<Meta.FileConfig.FileInfo> oldFiles = oldMeta.getFileConfig().getFiles();
-            oldFiles.add(fileInfo);
+            oldFiles.addAll(newFileInfos);
             List<Meta.ModelConfig.ModelInfo> oldModels = oldMeta.getModelConfig().getModels();
             oldModels.add(modelInfo);
 
@@ -102,7 +88,7 @@ public class TemplateMaker {
 
             List<Meta.FileConfig.FileInfo> fileInfoList = new ArrayList<>();
 
-            fileInfoList.add(fileInfo);
+            fileInfoList.addAll(newFileInfos);
 
             fileConfig.setFiles(fileInfoList);
 
@@ -119,6 +105,37 @@ public class TemplateMaker {
         }
 
         return id;
+    }
+
+    private static Meta.FileConfig.FileInfo makeFileTemplate(String searchStr, Meta.ModelConfig.ModelInfo modelInfo, File inputFilePath,String sourceRootPath) {
+        String fileInputPath = inputFilePath.getAbsolutePath().replace(sourceRootPath+"/","");
+
+        //要输出的文件
+        String fileOutputPath = fileInputPath + ".ftl";
+
+        //二、使用字符串替换，生成模板文件
+        String fileInputAbsolutePath = inputFilePath.getAbsolutePath();
+        String fileOutputAbsolutePath = inputFilePath.getAbsolutePath()+".ftl";
+        String fileContent = FileUtil.readUtf8String(fileInputAbsolutePath);
+        //如果已有模板文件，表示不是第一次制作，则在原有模板文件上修改
+        if (FileUtil.exist(fileOutputAbsolutePath)) {
+            fileContent = FileUtil.readUtf8String(fileOutputAbsolutePath);
+        }
+
+        String replacement = String.format("${%s}", modelInfo.getFieldName());
+        String newContent = StrUtil.replace(fileContent, searchStr, replacement);
+
+        //输出模板文件
+
+        FileUtil.writeUtf8String(newContent, fileOutputAbsolutePath);
+
+        //文件配置信息
+        Meta.FileConfig.FileInfo fileInfo = new Meta.FileConfig.FileInfo();
+        fileInfo.setInputPath(fileInputPath);
+        fileInfo.setOutputPath(fileOutputPath);
+        fileInfo.setType(FileTypeEnum.File.getValue());
+        fileInfo.setGenerateType(FileGenerateTypeEnum.DYNAMIC.getValue());
+        return fileInfo;
     }
 
     /**
