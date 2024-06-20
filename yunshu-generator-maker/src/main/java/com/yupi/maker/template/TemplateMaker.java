@@ -93,6 +93,11 @@ public class TemplateMaker {
             oldFiles.add(fileInfo);
             List<Meta.ModelConfig.ModelInfo> oldModels = oldMeta.getModelConfig().getModels();
             oldModels.add(modelInfo);
+
+            //配置去重
+            oldMeta.getModelConfig().setModels(distinctModels(oldModels));
+            oldMeta.getFileConfig().setFiles(distinctFiles(oldFiles));
+
             //2.输出元信息文件
             FileUtil.writeUtf8String(JSONUtil.toJsonPrettyStr(oldMeta), metaPath);
         } else {
@@ -141,7 +146,17 @@ public class TemplateMaker {
         ).values());
         return newFileInfos;
     }
-
+    /**
+     * 模型去重
+     * @param modelInfoList
+     * @return
+     */
+    private static List<Meta.ModelConfig.ModelInfo> distinctModels(List<Meta.ModelConfig.ModelInfo> modelInfoList) {
+        ArrayList<Meta.ModelConfig.ModelInfo> newModelInfos = new ArrayList<>(modelInfoList.stream().collect(
+                Collectors.toMap(Meta.ModelConfig.ModelInfo::getFieldName, modelInfo -> modelInfo, (e, r) -> r)
+        ).values());
+        return newModelInfos;
+    }
 
     public static void main(String[] args) {
 
