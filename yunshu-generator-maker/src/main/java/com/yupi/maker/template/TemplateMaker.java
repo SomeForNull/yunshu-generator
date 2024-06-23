@@ -332,8 +332,15 @@ public class TemplateMaker {
         fileGroupConfig.setGroupKey("test");
         fileGroupConfig.setGroupName("测试分组");
         templateMakerFileConfig.setFileGroupConfig(fileGroupConfig);
-
-        long id = TemplateMaker.makeTemplate(originalProjectPath, templateMakerFileConfig, meta, 1803405813415804928L);
+        //模型配置
+        TemplateMakerModelConfig.ModelInfoConfig modelInfoConfig = new TemplateMakerModelConfig.ModelInfoConfig();
+        modelInfoConfig.setFieldName("outputText");
+        modelInfoConfig.setType("String");
+        modelInfoConfig.setReplaceText(searchStr);
+        List<TemplateMakerModelConfig.ModelInfoConfig> modelInfoConfigList = Arrays.asList(modelInfoConfig);
+        TemplateMakerModelConfig templateMakerModelConfig = new TemplateMakerModelConfig();
+        templateMakerModelConfig.setModels(modelInfoConfigList);
+        long id = TemplateMaker.makeTemplate(originalProjectPath, templateMakerFileConfig, templateMakerModelConfig, meta,1803405813415804928L);
         System.out.println(id);
     }
 
