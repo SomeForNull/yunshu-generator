@@ -1,5 +1,6 @@
 package com.yupi.maker.template;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
@@ -14,10 +15,7 @@ import com.yupi.maker.template.model.TemplateMakerFileConfig;
 
 import java.io.File;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -81,19 +79,18 @@ public class TemplateMaker {
         String metaPath = sourceRootPath + File.separator + "meta.json";
         //已有meta文件，不是第一次制作
         if (FileUtil.exist(metaPath)) {
-            Meta oldMeta = JSONUtil.toBean(FileUtil.readUtf8String(metaPath), Meta.class);
+            meta = JSONUtil.toBean(FileUtil.readUtf8String(metaPath), Meta.class);
             //1.追加配置参数
-            List<Meta.FileConfig.FileInfo> oldFiles = oldMeta.getFileConfig().getFiles();
+            List<Meta.FileConfig.FileInfo> oldFiles = meta.getFileConfig().getFiles();
             oldFiles.addAll(newFileInfos);
-            List<Meta.ModelConfig.ModelInfo> oldModels = oldMeta.getModelConfig().getModels();
+            List<Meta.ModelConfig.ModelInfo> oldModels = meta.getModelConfig().getModels();
             oldModels.add(modelInfo);
 
             //配置去重
-            oldMeta.getModelConfig().setModels(distinctModels(oldModels));
-            oldMeta.getFileConfig().setFiles(distinctFiles(oldFiles));
+            meta.getModelConfig().setModels(distinctModels(oldModels));
+            meta.getFileConfig().setFiles(distinctFiles(oldFiles));
 
-            //2.输出元信息文件
-            FileUtil.writeUtf8String(JSONUtil.toJsonPrettyStr(oldMeta), metaPath);
+
         } else {
             //1.构造配置参数对象
 
@@ -115,12 +112,9 @@ public class TemplateMaker {
             List<Meta.ModelConfig.ModelInfo> modelInfoList = new ArrayList<>();
             modelInfoList.add(modelInfo);
             modelConfig.setModels(modelInfoList);
-
-            //2.生成元信息文件
-            FileUtil.writeUtf8String(JSONUtil.toJsonPrettyStr(meta), metaPath);
-
         }
-
+        //输出元信息文件
+        FileUtil.writeUtf8String(JSONUtil.toJsonPrettyStr(meta), metaPath);
         return id;
     }
 
@@ -172,10 +166,38 @@ public class TemplateMaker {
      * @return
      */
     private static List<Meta.FileConfig.FileInfo> distinctFiles(List<Meta.FileConfig.FileInfo> fileInfoList) {
-        ArrayList<Meta.FileConfig.FileInfo> newFileInfos = new ArrayList<>(fileInfoList.stream().collect(
-                Collectors.toMap(Meta.FileConfig.FileInfo::getInputPath, fileInfo -> fileInfo, (e, r) -> r)
-        ).values());
-        return newFileInfos;
+        //将文件分为有分组和无分组
+        //1.有分组
+        Map<String, List<Meta.FileConfig.FileInfo>> groupKeyFileInfoListMap = fileInfoList
+                .stream()
+                .filter(fileInfo -> StrUtil.isNotBlank(fileInfo.getGroupKey()))
+                .collect(
+                        Collectors.groupingBy(Meta.FileConfig.FileInfo::getGroupKey)
+                );
+        //将同组文件合并
+        // 保存每个组对应的合并后的对象 map
+        Map<String, Meta.FileConfig.FileInfo> groupKeyMergedFileInfoMap = new HashMap<>();
+        for (Map.Entry<String, List<Meta.FileConfig.FileInfo>> entry : groupKeyFileInfoListMap.entrySet()) {
+            List<Meta.FileConfig.FileInfo> tempFileInfoList = entry.getValue();
+            List<Meta.FileConfig.FileInfo> newFileInfoList=new ArrayList<>(tempFileInfoList.stream().flatMap(fileInfo -> fileInfo.getFiles().stream())
+                    .collect(
+                            Collectors.toMap(Meta.FileConfig.FileInfo::getInputPath, fileInfo -> fileInfo, (e, r) -> r))
+                    .values()
+            );
+            //每个组取最新的fileInfo
+            Meta.FileConfig.FileInfo newFileInfo = CollUtil.getLast(tempFileInfoList);
+            //设置files
+            newFileInfo.setFiles(newFileInfoList);
+            groupKeyMergedFileInfoMap.put(entry.getKey(), newFileInfo);
+        }
+        ArrayList<Meta.FileConfig.FileInfo> resultList = new ArrayList<>(groupKeyMergedFileInfoMap.values());
+
+        resultList.addAll(new ArrayList<>(fileInfoList.stream()
+                .filter(fileInfo -> StrUtil.isBlank(fileInfo.getGroupKey()))
+                .collect(
+                        Collectors.toMap(Meta.FileConfig.FileInfo::getInputPath, fileInfo -> fileInfo, (e, r) -> r)
+                ).values()));
+        return resultList;
     }
     /**
      * 模型去重
