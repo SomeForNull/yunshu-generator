@@ -52,7 +52,7 @@ public class TemplateMaker {
         sourceRootPath = sourceRootPath.replaceAll("\\\\", "/");
         //支持遍历多个文件
         List<Meta.FileConfig.FileInfo> newFileInfos = new ArrayList<>();
-        List<TemplateMakerFileConfig.FileInfoConfig> fileInfoConfig = templateMakerFileConfig.getFiles();
+        List<TemplateMakerFileConfig.FileInfoConfig> fileInfoConfig = templateMakerFileConfig.getFileInfoConfigList();
         for ( TemplateMakerFileConfig.FileInfoConfig fileConfig : fileInfoConfig) {
             String inputFileAbsolutePath = sourceRootPath + File.separator + fileConfig.getPath();
             //传入绝对路径
@@ -62,7 +62,21 @@ public class TemplateMaker {
                 newFileInfos.add(fileInfo);
             }
         }
-
+        //如果是文件組
+        TemplateMakerFileConfig.FileGroupConfig fileGroupConfig = templateMakerFileConfig.getFileGroupConfig();
+        if(fileGroupConfig != null){
+            String condition = fileGroupConfig.getCondition();
+            String groupKey = fileGroupConfig.getGroupKey();
+            String groupName = fileGroupConfig.getGroupName();
+            Meta.FileConfig.FileInfo fileInfo = new Meta.FileConfig.FileInfo();
+            fileInfo.setCondition(condition);
+            fileInfo.setGroupKey(groupKey);
+            fileInfo.setGroupName(groupName);
+            //文件全放到一个分组内
+            fileInfo.setFiles(newFileInfos);
+            newFileInfos = new ArrayList<>();
+            newFileInfos.add(fileInfo);
+        }
         //三、生成配置文件
         String metaPath = sourceRootPath + File.separator + "meta.json";
         //已有meta文件，不是第一次制作
@@ -218,7 +232,14 @@ public class TemplateMaker {
 
         List<TemplateMakerFileConfig.FileInfoConfig> fileInfoConfigList = Arrays.asList(fileInfoConfig1, fileInfoConfig2);
         TemplateMakerFileConfig templateMakerFileConfig = new TemplateMakerFileConfig();
-        templateMakerFileConfig.setFiles(fileInfoConfigList);
+        templateMakerFileConfig.setFileInfoConfigList(fileInfoConfigList);
+
+        //分组配置
+        TemplateMakerFileConfig.FileGroupConfig fileGroupConfig = new TemplateMakerFileConfig.FileGroupConfig();
+        fileGroupConfig.setCondition("out");
+        fileGroupConfig.setGroupKey("test");
+        fileGroupConfig.setGroupName("测试分组");
+        templateMakerFileConfig.setFileGroupConfig(fileGroupConfig);
 
         long id = TemplateMaker.makeTemplate(originalProjectPath, templateMakerFileConfig, searchStr, meta, modelInfo, 1803405813415804928L);
         System.out.println(id);

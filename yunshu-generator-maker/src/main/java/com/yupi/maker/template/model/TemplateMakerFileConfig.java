@@ -9,7 +9,9 @@ import java.util.List;
 @Data
 
 public class TemplateMakerFileConfig {
-    private List<FileInfoConfig> files;
+    private List<FileInfoConfig> fileInfoConfigList;
+
+    private FileGroupConfig fileGroupConfig;
     @NoArgsConstructor
     @Data
     public static class FileInfoConfig{
@@ -17,5 +19,12 @@ public class TemplateMakerFileConfig {
         private List<FileFilterConfig> fileFilterConfigList;
     }
 
+    @NoArgsConstructor
+    @Data
+    public static class FileGroupConfig{
+        private String condition;
+        private String groupKey;
+        private String groupName;
+    }
 
 }
