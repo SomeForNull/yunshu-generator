@@ -187,7 +187,7 @@ public class TemplateMaker {
         fileInfo.setType(FileTypeEnum.File.getValue());
         fileInfo.setGenerateType(FileGenerateTypeEnum.DYNAMIC.getValue());
         // 和原文件一致，没有挖坑，则为静态生成
-        if (newContent.equals(fileContent)) {
+        if (newFileContent.equals(fileContent)) {
             // 输出路径 = 输入路径
             fileInfo.setOutputPath(fileInputPath);
             fileInfo.setGenerateType(FileGenerateTypeEnum.STATIC.getValue());
@@ -195,7 +195,7 @@ public class TemplateMaker {
             // 生成模板文件
             fileInfo.setGenerateType(FileGenerateTypeEnum.DYNAMIC.getValue());
             //输出模板文件
-            FileUtil.writeUtf8String(newContent, fileOutputAbsolutePath);
+            FileUtil.writeUtf8String(newFileContent, fileOutputAbsolutePath);
         }
         return fileInfo;
     }
