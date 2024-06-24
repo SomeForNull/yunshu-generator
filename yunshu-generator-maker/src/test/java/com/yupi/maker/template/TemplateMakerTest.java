@@ -1,9 +1,12 @@
 package com.yupi.maker.template;
 
+import cn.hutool.core.io.resource.ResourceUtil;
+import cn.hutool.json.JSONUtil;
 import com.yupi.maker.meta.Meta;
 import com.yupi.maker.template.enums.FileFilterRangeEnum;
 import com.yupi.maker.template.enums.FileFilterRuleEnum;
 import com.yupi.maker.template.model.FileFilterConfig;
+import com.yupi.maker.template.model.TemplateMakerConfig;
 import com.yupi.maker.template.model.TemplateMakerFileConfig;
 import com.yupi.maker.template.model.TemplateMakerModelConfig;
 import org.junit.Test;
@@ -49,7 +52,7 @@ public class TemplateMakerTest {
 
         List<TemplateMakerFileConfig.FileInfoConfig> fileInfoConfigList = Arrays.asList(fileInfoConfig1, fileInfoConfig2);
         TemplateMakerFileConfig templateMakerFileConfig = new TemplateMakerFileConfig();
-        templateMakerFileConfig.setFileInfoConfigList(fileInfoConfigList);
+        templateMakerFileConfig.setFiles(fileInfoConfigList);
 
         //分组配置
         TemplateMakerFileConfig.FileGroupConfig fileGroupConfig = new TemplateMakerFileConfig.FileGroupConfig();
@@ -79,6 +82,16 @@ public class TemplateMakerTest {
 
         templateMakerModelConfig.setModelGroupConfig(modelGroupConfig);
         long id = TemplateMaker.makeTemplate(originalProjectPath, templateMakerFileConfig, templateMakerModelConfig, meta,1803405813415804928L);
+        System.out.println(id);
+    }
+    /**
+     * 使用 JSON 制作模板
+     */
+    @Test
+    public void testMakeTemplateWithJSON() {
+        String configStr = ResourceUtil.readUtf8Str("templateMaker.json");
+        TemplateMakerConfig templateMakerConfig = JSONUtil.toBean(configStr, TemplateMakerConfig.class);
+        long id = TemplateMaker.makeTemplate(templateMakerConfig);
         System.out.println(id);
     }
 }

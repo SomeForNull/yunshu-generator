@@ -12,6 +12,7 @@ import com.yupi.maker.meta.enums.FileTypeEnum;
 import com.yupi.maker.template.enums.FileFilterRangeEnum;
 import com.yupi.maker.template.enums.FileFilterRuleEnum;
 import com.yupi.maker.template.model.FileFilterConfig;
+import com.yupi.maker.template.model.TemplateMakerConfig;
 import com.yupi.maker.template.model.TemplateMakerFileConfig;
 import com.yupi.maker.template.model.TemplateMakerModelConfig;
 
@@ -24,6 +25,27 @@ import java.util.stream.Collectors;
  * 模板制作工具
  */
 public class TemplateMaker {
+    /**
+     * 模版制作方法
+     * @return
+     */
+    public static long makeTemplate(TemplateMakerConfig templateMakerConfig){
+        Long id = templateMakerConfig.getId();
+        Meta meta = templateMakerConfig.getMeta();
+        String originProjectPath = templateMakerConfig.getOriginProjectPath();
+        TemplateMakerFileConfig fileConfig = templateMakerConfig.getFileConfig();
+        TemplateMakerModelConfig modelConfig = templateMakerConfig.getModelConfig();
+        return makeTemplate(originProjectPath, fileConfig, modelConfig, meta, id);
+    }
+    /**
+     * 模版制作方法
+     * @param originalProjectPath
+     * @param templateMakerFileConfig
+     * @param templateMakerModelConfig
+     * @param meta
+     * @param id
+     * @return
+     */
     public static long makeTemplate(String originalProjectPath, TemplateMakerFileConfig templateMakerFileConfig, TemplateMakerModelConfig templateMakerModelConfig, Meta meta, Long id) {
         // 没有 id 则生成
         if (id == null) {
@@ -80,7 +102,7 @@ public class TemplateMaker {
         sourceRootPath = sourceRootPath.replaceAll("\\\\", "/");
         //支持遍历多个文件
         List<Meta.FileConfig.FileInfo> newFileInfos = new ArrayList<>();
-        List<TemplateMakerFileConfig.FileInfoConfig> fileInfoConfig = templateMakerFileConfig.getFileInfoConfigList();
+        List<TemplateMakerFileConfig.FileInfoConfig> fileInfoConfig = templateMakerFileConfig.getFiles();
         for ( TemplateMakerFileConfig.FileInfoConfig fileConfig : fileInfoConfig) {
             String inputFileAbsolutePath = sourceRootPath + File.separator + fileConfig.getPath();
             //传入绝对路径
