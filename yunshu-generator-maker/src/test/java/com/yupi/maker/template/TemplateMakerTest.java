@@ -81,7 +81,7 @@ public class TemplateMakerTest {
         modelGroupConfig.setGroupName("mysql");
 
         templateMakerModelConfig.setModelGroupConfig(modelGroupConfig);
-        long id = TemplateMaker.makeTemplate(originalProjectPath, templateMakerFileConfig, templateMakerModelConfig, meta,1803405813415804928L);
+        long id = TemplateMaker.makeTemplate(originalProjectPath, templateMakerFileConfig, templateMakerModelConfig, null,meta,1803405813415804928L);
         System.out.println(id);
     }
     /**

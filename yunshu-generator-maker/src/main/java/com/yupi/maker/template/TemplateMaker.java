@@ -11,10 +11,7 @@ import com.yupi.maker.meta.enums.FileGenerateTypeEnum;
 import com.yupi.maker.meta.enums.FileTypeEnum;
 import com.yupi.maker.template.enums.FileFilterRangeEnum;
 import com.yupi.maker.template.enums.FileFilterRuleEnum;
-import com.yupi.maker.template.model.FileFilterConfig;
-import com.yupi.maker.template.model.TemplateMakerConfig;
-import com.yupi.maker.template.model.TemplateMakerFileConfig;
-import com.yupi.maker.template.model.TemplateMakerModelConfig;
+import com.yupi.maker.template.model.*;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -35,18 +32,20 @@ public class TemplateMaker {
         String originProjectPath = templateMakerConfig.getOriginProjectPath();
         TemplateMakerFileConfig fileConfig = templateMakerConfig.getFileConfig();
         TemplateMakerModelConfig modelConfig = templateMakerConfig.getModelConfig();
-        return makeTemplate(originProjectPath, fileConfig, modelConfig, meta, id);
+        TemplateMakerOutputConfig outputConfig = templateMakerConfig.getOutputConfig();
+        return makeTemplate(originProjectPath, fileConfig, modelConfig,outputConfig, meta, id);
     }
     /**
      * 模版制作方法
      * @param originalProjectPath
      * @param templateMakerFileConfig
      * @param templateMakerModelConfig
+     * @param templateMakerOutputConfig
      * @param meta
      * @param id
      * @return
      */
-    public static long makeTemplate(String originalProjectPath, TemplateMakerFileConfig templateMakerFileConfig, TemplateMakerModelConfig templateMakerModelConfig, Meta meta, Long id) {
+    public static long makeTemplate(String originalProjectPath, TemplateMakerFileConfig templateMakerFileConfig, TemplateMakerModelConfig templateMakerModelConfig, TemplateMakerOutputConfig templateMakerOutputConfig, Meta meta, Long id) {
         // 没有 id 则生成
         if (id == null) {
             id = IdUtil.getSnowflakeNextId();
@@ -118,6 +117,15 @@ public class TemplateMaker {
             List<Meta.ModelConfig.ModelInfo> modelInfoList = new ArrayList<>();
             modelInfoList.addAll(newModelInfoList);
             modelConfig.setModels(modelInfoList);
+        }
+        //额外的输出配置
+        if(templateMakerOutputConfig!=null){
+            //文件外层和分组去重
+            if(templateMakerOutputConfig.isRemoveGroupFilesFromRoot()){
+                List<Meta.FileConfig.FileInfo> fileInfoList = meta.getFileConfig().getFiles();
+                meta.getFileConfig().setFiles(TemplateMakerUtils.removeGroupFilesFromRoot(fileInfoList));
+
+            }
         }
         //输出元信息文件
         FileUtil.writeUtf8String(JSONUtil.toJsonPrettyStr(meta), metaPath);
