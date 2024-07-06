@@ -100,18 +100,22 @@ public class TemplateMakerTest {
     @Test
     public void testMakeSpringbootTemplate() {
         String rootPath="examples/springboot-init/";
+        //基础信息制作
         String configStr = ResourceUtil.readUtf8Str(rootPath+"templateMaker.json");
         TemplateMakerConfig templateMakerConfig = JSONUtil.toBean(configStr, TemplateMakerConfig.class);
         long id = TemplateMaker.makeTemplate(templateMakerConfig);
-
+        //包名替换
         configStr = ResourceUtil.readUtf8Str(rootPath+"templateMaker1.json");
         templateMakerConfig = JSONUtil.toBean(configStr, TemplateMakerConfig.class);
         TemplateMaker.makeTemplate(templateMakerConfig);
-
+        //控制帖子相关文件是否生成
         configStr = ResourceUtil.readUtf8Str(rootPath+"templateMaker2.json");
         templateMakerConfig = JSONUtil.toBean(configStr, TemplateMakerConfig.class);
         TemplateMaker.makeTemplate(templateMakerConfig);
-
+        //控制是否跨域
+        configStr = ResourceUtil.readUtf8Str(rootPath+"templateMaker3.json");
+        templateMakerConfig = JSONUtil.toBean(configStr, TemplateMakerConfig.class);
+        TemplateMaker.makeTemplate(templateMakerConfig);
         System.out.println(id);
     }
 

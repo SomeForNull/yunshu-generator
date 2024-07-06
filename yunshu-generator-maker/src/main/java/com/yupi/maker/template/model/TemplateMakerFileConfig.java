@@ -10,12 +10,14 @@ import java.util.List;
 
 public class TemplateMakerFileConfig {
     private List<FileInfoConfig> files;
-
     private FileGroupConfig fileGroupConfig;
     @NoArgsConstructor
     @Data
     public static class FileInfoConfig{
         private String path;
+
+        private String condition;
+
         private List<FileFilterConfig> fileFilterConfigList;
     }
 

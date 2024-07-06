@@ -79,7 +79,7 @@ public class TemplateMaker {
 
         sourceRootPath = sourceRootPath.replaceAll("\\\\", "/");
         //二、生成文件模板
-        List<Meta.FileConfig.FileInfo> newFileInfos = makeFileTempaltes(templateMakerFileConfig, templateMakerModelConfig, sourceRootPath);
+        List<Meta.FileConfig.FileInfo> newFileInfos = makeFileTemplates(templateMakerFileConfig, templateMakerModelConfig, sourceRootPath);
         //三、生成配置文件
         String metaPath = templatePath + File.separator + "meta.json";
         //已有meta文件，不是第一次制作
@@ -182,7 +182,7 @@ public class TemplateMaker {
      * @param sourceRootPath
      * @return
      */
-    private static List<Meta.FileConfig.FileInfo> makeFileTempaltes(TemplateMakerFileConfig templateMakerFileConfig, TemplateMakerModelConfig templateMakerModelConfig, String sourceRootPath) {
+    private static List<Meta.FileConfig.FileInfo> makeFileTemplates(TemplateMakerFileConfig templateMakerFileConfig, TemplateMakerModelConfig templateMakerModelConfig, String sourceRootPath) {
         //支持遍历多个文件
         List<Meta.FileConfig.FileInfo> newFileInfos = new ArrayList<>();
         //非空校验
@@ -202,7 +202,7 @@ public class TemplateMaker {
                     .filter(file -> !file.getAbsolutePath().endsWith(".ftl"))
                     .collect(Collectors.toList());
             for (File file : fileList) {
-                Meta.FileConfig.FileInfo fileInfo = makeFileTemplate(templateMakerModelConfig, file, sourceRootPath);
+                Meta.FileConfig.FileInfo fileInfo = makeFileTemplate(templateMakerModelConfig, fileConfig,file, sourceRootPath);
                 newFileInfos.add(fileInfo);
             }
         }
@@ -231,7 +231,7 @@ public class TemplateMaker {
      * @param sourceRootPath
      * @return
      */
-    private static Meta.FileConfig.FileInfo makeFileTemplate(TemplateMakerModelConfig templateMakerModelConfig, File inputFilePath,String sourceRootPath) {
+    private static Meta.FileConfig.FileInfo makeFileTemplate(TemplateMakerModelConfig templateMakerModelConfig, TemplateMakerFileConfig.FileInfoConfig fileInfoConfig, File inputFilePath, String sourceRootPath) {
         String fileInputPath = inputFilePath.getAbsolutePath().replaceAll("\\\\","/").replace(sourceRootPath+"/","");
 
         //要输出的文件
@@ -268,6 +268,7 @@ public class TemplateMaker {
         Meta.FileConfig.FileInfo fileInfo = new Meta.FileConfig.FileInfo();
         fileInfo.setInputPath(fileOutputPath);
         fileInfo.setOutputPath(fileInputPath);
+        fileInfo.setCondition(fileInfoConfig.getCondition());
         fileInfo.setType(FileTypeEnum.File.getValue());
         fileInfo.setGenerateType(FileGenerateTypeEnum.DYNAMIC.getValue());
 
