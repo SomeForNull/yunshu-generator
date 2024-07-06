@@ -94,4 +94,20 @@ public class TemplateMakerTest {
         long id = TemplateMaker.makeTemplate(templateMakerConfig);
         System.out.println(id);
     }
+    /**
+     * 制作springboot模板
+     */
+    @Test
+    public void testMakeSpringbootTemplate() {
+        String rootPath="examples/springboot-init/";
+        String configStr = ResourceUtil.readUtf8Str(rootPath+"templateMaker.json");
+        TemplateMakerConfig templateMakerConfig = JSONUtil.toBean(configStr, TemplateMakerConfig.class);
+        long id = TemplateMaker.makeTemplate(templateMakerConfig);
+
+        configStr = ResourceUtil.readUtf8Str(rootPath+"templateMaker1.json");
+        templateMakerConfig = JSONUtil.toBean(configStr, TemplateMakerConfig.class);
+        TemplateMaker.makeTemplate(templateMakerConfig);
+        System.out.println(id);
+    }
+
 }
