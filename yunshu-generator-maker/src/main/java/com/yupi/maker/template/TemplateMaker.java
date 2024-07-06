@@ -66,7 +66,7 @@ public class TemplateMaker {
 
         //输入信息
         //一、处理模型信息
-        List<Meta.ModelConfig.ModelInfo> newModelInfoList = makeModelTempaltes(templateMakerModelConfig);
+        List<Meta.ModelConfig.ModelInfo> newModelInfoList = makeModelTemplates(templateMakerModelConfig);
 
         //2、输入文件信息
         //要挖坑的根目录
@@ -137,7 +137,7 @@ public class TemplateMaker {
      * @param templateMakerModelConfig
      * @return
      */
-    private static List<Meta.ModelConfig.ModelInfo> makeModelTempaltes(TemplateMakerModelConfig templateMakerModelConfig) {
+    private static List<Meta.ModelConfig.ModelInfo> makeModelTemplates(TemplateMakerModelConfig templateMakerModelConfig) {
         // 本次新增的模型配置列表
         List<Meta.ModelConfig.ModelInfo> newModelInfoList = new ArrayList<>();
         //非空校验
@@ -158,16 +158,11 @@ public class TemplateMaker {
         //如果是模型組
         TemplateMakerModelConfig.ModelGroupConfig modelGroupConfig = templateMakerModelConfig.getModelGroupConfig();
         if(modelGroupConfig != null){
-            String condition = modelGroupConfig.getCondition();
-            String groupKey = modelGroupConfig.getGroupKey();
-            String groupName = modelGroupConfig.getGroupName();
             Meta.ModelConfig.ModelInfo modelInfo = new Meta.ModelConfig.ModelInfo();
-            modelInfo.setCondition(condition);
-            modelInfo.setGroupKey(groupKey);
-            modelInfo.setGroupName(groupName);
+            //复制变量
+            BeanUtil.copyProperties(modelGroupConfig,modelInfo);
             //模型全放到一个分组内
             modelInfo.setModels(inputModelInfoList);
-            newModelInfoList = new ArrayList<>();
             newModelInfoList.add(modelInfo);
         }else {
             newModelInfoList.addAll(inputModelInfoList);

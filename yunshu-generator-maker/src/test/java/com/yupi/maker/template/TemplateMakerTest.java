@@ -116,6 +116,14 @@ public class TemplateMakerTest {
         configStr = ResourceUtil.readUtf8Str(rootPath+"templateMaker3.json");
         templateMakerConfig = JSONUtil.toBean(configStr, TemplateMakerConfig.class);
         TemplateMaker.makeTemplate(templateMakerConfig);
+        //控制
+        configStr = ResourceUtil.readUtf8Str(rootPath+"templateMaker3.json");
+        templateMakerConfig = JSONUtil.toBean(configStr, TemplateMakerConfig.class);
+        TemplateMaker.makeTemplate(templateMakerConfig);
+        //控制是否跨域
+        configStr = ResourceUtil.readUtf8Str(rootPath+"templateMaker3.json");
+        templateMakerConfig = JSONUtil.toBean(configStr, TemplateMakerConfig.class);
+        TemplateMaker.makeTemplate(templateMakerConfig);
         System.out.println(id);
     }
 
