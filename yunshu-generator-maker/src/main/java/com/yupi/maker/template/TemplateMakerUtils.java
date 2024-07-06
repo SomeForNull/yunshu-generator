@@ -25,6 +25,8 @@ public class TemplateMakerUtils {
         Set<String> fileInputPathSet = groupInnerFileInfoList.stream()
                 .map(Meta.FileConfig.FileInfo::getInputPath)
                 .collect(Collectors.toSet());
+        //todo 保留分组内的
+
         //移除所有在集合内的外层文件
        return fileInfoList.stream()
                 .filter(fileInfo -> !fileInputPathSet.contains(fileInfo.getInputPath()))
