@@ -204,19 +204,25 @@ public class TemplateMaker {
         //如果是文件組
         TemplateMakerFileConfig.FileGroupConfig fileGroupConfig = templateMakerFileConfig.getFileGroupConfig();
         if(fileGroupConfig != null){
-            String condition = fileGroupConfig.getCondition();
-            String groupKey = fileGroupConfig.getGroupKey();
-            String groupName = fileGroupConfig.getGroupName();
-            Meta.FileConfig.FileInfo fileInfo = new Meta.FileConfig.FileInfo();
-            fileInfo.setCondition(condition);
-            fileInfo.setGroupKey(groupKey);
-            fileInfo.setGroupName(groupName);
-            //文件全放到一个分组内
-            fileInfo.setFiles(newFileInfos);
+            Meta.FileConfig.FileInfo fileInfo = getFileInfo(fileGroupConfig, newFileInfos);
             newFileInfos = new ArrayList<>();
             newFileInfos.add(fileInfo);
         }
         return newFileInfos;
+    }
+
+    private static Meta.FileConfig.FileInfo getFileInfo(TemplateMakerFileConfig.FileGroupConfig fileGroupConfig, List<Meta.FileConfig.FileInfo> newFileInfos) {
+        String condition = fileGroupConfig.getCondition();
+        String groupKey = fileGroupConfig.getGroupKey();
+        String groupName = fileGroupConfig.getGroupName();
+        Meta.FileConfig.FileInfo fileInfo = new Meta.FileConfig.FileInfo();
+        fileInfo.setCondition(condition);
+        fileInfo.setGroupKey(groupKey);
+        fileInfo.setGroupName(groupName);
+        fileInfo.setType(FileTypeEnum.GROUP.getValue());
+        //文件全放到一个分组内
+        fileInfo.setFiles(newFileInfos);
+        return fileInfo;
     }
 
     /**

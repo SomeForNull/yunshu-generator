@@ -1,6 +1,6 @@
 package ${basePackage}.generator;
 import freemarker.template.TemplateException;
-import com.yunshu.model.DataModel;
+import ${basePackage}.model.DataModel;
 import java.io.File;
 import java.io.IOException;
 
