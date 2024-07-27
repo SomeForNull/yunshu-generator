@@ -3,9 +3,9 @@ import UpdateModal from '@/pages/Admin/Generator/components/UpdateModal';
 import { deleteGeneratorUsingPost, listGeneratorByPageUsingPost } from '@/services/backend/generatorController';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
-import { PageContainer, ProTable } from '@ant-design/pro-components';
+import { ProTable } from '@ant-design/pro-components';
 import '@umijs/max';
-import { Button, message, Space, Typography } from 'antd';
+import {Button, message, Select, Space, Tag, Typography} from 'antd';
 import React, { useRef, useState } from 'react';
 
 /**
@@ -56,18 +56,49 @@ const GeneratorAdminPage: React.FC = () => {
       hideInForm: true,
     },
     {
-      title: '账号',
-      dataIndex: 'generatorAccount',
+      title: '名称',
+      dataIndex: 'name',
       valueType: 'text',
     },
     {
-      title: '代码生成器名',
-      dataIndex: 'generatorName',
+      title: '描述',
+      dataIndex: 'description',
+      valueType: 'textarea',
+    },
+    {
+      title: '基础包',
+      dataIndex: 'basePackage',
       valueType: 'text',
+    },    {
+      title: '版本',
+      dataIndex: 'version',
+      valueType: 'text',
+    },    {
+      title: '作者',
+      dataIndex: 'author',
+      valueType: 'text',
+    },
+    {
+      title: '标签',
+      dataIndex: 'tags',
+      valueType: 'text',
+      renderFormItem: (schema) => {
+        const { fieldProps } = schema;
+        // @ts-ignore
+        return <Select {...fieldProps} mode="tags" />;
+      },
+      render(_, record) {
+        if (!record.tags) {
+          return <></>;
+        }
+        return JSON.parse(record.tags).map((tag: string) => {
+          return <Tag key={tag}>{tag}</Tag>;
+        });
+      },
     },
     {
       title: '头像',
-      dataIndex: 'generatorAvatar',
+      dataIndex: 'picture',
       valueType: 'image',
       fieldProps: {
         width: 64,
@@ -75,21 +106,33 @@ const GeneratorAdminPage: React.FC = () => {
       hideInSearch: true,
     },
     {
-      title: '简介',
-      dataIndex: 'generatorProfile',
-      valueType: 'textarea',
+      title: '文件配置',
+      dataIndex: 'fileConfig',
+      valueType: 'jsonCode',
     },
     {
-      title: '权限',
-      dataIndex: 'generatorRole',
+      title: '模型配置',
+      dataIndex: 'modelConfig',
+      valueType: 'jsonCode',
+    },
+    {
+      title: '产物包',
+      dataIndex: 'distPath',
+      valueType: 'text',
+    },
+    {
+      title: '状态',
+      dataIndex: 'status',
       valueEnum: {
-        generator: {
-          text: '代码生成器',
-        },
-        admin: {
-          text: '管理员',
+        0: {
+          text: '默认',
         },
       },
+    },
+    {
+      title: '创建用户',
+      dataIndex: 'userId',
+      valueType: 'text',
     },
     {
       title: '创建时间',
@@ -128,12 +171,15 @@ const GeneratorAdminPage: React.FC = () => {
       ),
     },
   ];
+
   return (
-    <PageContainer>
+    <div className="generator-admin-page">
+      <Typography.Title level={4} style={{ marginBottom: 16 }}>生成器管理</Typography.Title>
       <ProTable<API.Generator>
         headerTitle={'查询表格'}
         actionRef={actionRef}
-        rowKey="key"
+        // @ts-ignore
+        rowKey={record => record.id.toString()}
         search={{
           labelWidth: 120,
         }}
@@ -191,7 +237,7 @@ const GeneratorAdminPage: React.FC = () => {
           setUpdateModalVisible(false);
         }}
       />
-    </PageContainer>
+    </div>
   );
 };
 export default GeneratorAdminPage;

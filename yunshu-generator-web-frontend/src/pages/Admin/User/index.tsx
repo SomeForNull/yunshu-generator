@@ -128,12 +128,14 @@ const UserAdminPage: React.FC = () => {
       ),
     },
   ];
+
   return (
     <PageContainer>
       <ProTable<API.User>
         headerTitle={'查询表格'}
         actionRef={actionRef}
-        rowKey="key"
+        // @ts-ignore
+        rowKey={record => record.id.toString()}
         search={{
           labelWidth: 120,
         }}

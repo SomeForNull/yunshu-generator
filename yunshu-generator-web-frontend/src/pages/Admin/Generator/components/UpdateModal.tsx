@@ -18,6 +18,8 @@ interface Props {
  * @param fields
  */
 const handleUpdate = async (fields: API.GeneratorUpdateRequest) => {
+  fields.fileConfig = JSON.parse((fields.fileConfig || '{}') as string);
+  fields.modelConfig = JSON.parse((fields.modelConfig || '{}') as string);
   const hide = message.loading('正在更新');
   try {
     await updateGeneratorUsingPost(fields);
@@ -57,7 +59,10 @@ const UpdateModal: React.FC<Props> = (props) => {
         type="form"
         columns={columns}
         form={{
-          initialValues: oldData,
+          initialValues: {
+            ...oldData,
+            tags:JSON.parse((oldData.tags||'[]'))
+          },
         }}
         onSubmit={async (values: API.GeneratorAddRequest) => {
           const success = await handleUpdate({

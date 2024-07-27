@@ -3,6 +3,8 @@ import { ProColumns, ProTable } from '@ant-design/pro-components';
 import '@umijs/max';
 import { message, Modal } from 'antd';
 import React from 'react';
+import {scalarOptions} from "yaml";
+import Str = scalarOptions.Str;
 
 interface Props {
   visible: boolean;
@@ -16,6 +18,8 @@ interface Props {
  * @param fields
  */
 const handleAdd = async (fields: API.GeneratorAddRequest) => {
+  fields.fileConfig = JSON.parse((fields.fileConfig || '{}') as string);
+  fields.modelConfig = JSON.parse((fields.modelConfig || '{}') as string);
   const hide = message.loading('正在添加');
   try {
     await addGeneratorUsingPost(fields);
