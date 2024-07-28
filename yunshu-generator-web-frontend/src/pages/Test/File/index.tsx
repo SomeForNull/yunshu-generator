@@ -51,9 +51,9 @@ const TestFilePage: React.FC = () => {
         </Dragger>
       </Card>
       <Card title="文件下载" loading={!value}>
-        <div>文件地址：{value??COS_HOST}</div>
+        <div>文件地址：{COS_HOST + value}</div>
         <Divider />
-        <img src={value} height={280} />
+        <img src={COS_HOST + value} height={280} />
         <Divider />
         <Button
           onClick={async () => {
@@ -66,7 +66,7 @@ const TestFilePage: React.FC = () => {
               },
             );
             // 使用 file-saver 来保存文件
-            const fullPath = '' + value;
+            const fullPath = COS_HOST + value;
             saveAs(blob, fullPath.substring(fullPath.lastIndexOf('/') + 1));
           }}
         >
