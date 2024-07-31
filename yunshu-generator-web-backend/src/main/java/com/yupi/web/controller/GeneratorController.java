@@ -24,7 +24,6 @@ import com.yupi.web.model.entity.User;
 import com.yupi.web.model.vo.GeneratorVO;
 import com.yupi.web.service.GeneratorService;
 import com.yupi.web.service.UserService;
-import jdk.jpackage.internal.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +38,7 @@ import java.nio.file.attribute.PosixFilePermissions;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * 帖子接口
@@ -322,12 +322,12 @@ public class GeneratorController {
     public void useGenerator(
             @RequestBody GeneratorUseRequest generatorUseRequest,
             HttpServletRequest request,
-            HttpServletResponse response) {
+            HttpServletResponse response) throws IOException {
         Long id = generatorUseRequest.getId();
         Map<String, Object> dataModel = generatorUseRequest.getDataModel();
         // 需要登录
         User loginUser = userService.getLoginUser(request);
-        log.info("userId= {} 使用了生成器 id= {} ",loginUser.getId(),id);
+        log.info("userId= {} 使用了生成器 id= {} ", loginUser.getId(), id);
         Generator generator = generatorService.getById(id);
         if (generator == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
@@ -361,7 +361,7 @@ public class GeneratorController {
         FileUtil.writeUtf8String(jsonStr, dataModelFilePath);
         // 找到脚本文件所在路径
         File scriptFile = FileUtil.loopFiles(unzipDistDir, 2, null).stream()
-                .filter(file -> file.isFile() && "generator".equals(file.getName()))
+                .filter(file -> file.isFile() && "generator.bat".equals(file.getName()))
                 .findFirst()
                 .orElseThrow(RuntimeException::new);
         // 添加可执行权限
@@ -375,7 +375,7 @@ public class GeneratorController {
         File scriptDir = scriptFile.getParentFile();
         // 注意，如果是 mac / linux 系统，要用 "./generator"
         String scriptAbsolutePath = scriptFile.getAbsolutePath().replace("\\", "/");
-        String[] commands = new String[] {scriptAbsolutePath, "json-generate", "--file=" + dataModelFilePath};
+        String[] commands = new String[]{scriptAbsolutePath, "json-generate", "--file=" + dataModelFilePath};
         // 这里一定要拆分！
         ProcessBuilder processBuilder = new ProcessBuilder(commands);
         processBuilder.directory(scriptDir);
@@ -395,6 +395,19 @@ public class GeneratorController {
             e.printStackTrace();
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "执行生成器脚本错误");
         }
+        // 生成代码的位置
+        String generatedPath = scriptDir.getAbsolutePath() + "/generated";
+        String resultPath = tempDirPath + "/result.zip";
+        File resultFile = ZipUtil.zip(generatedPath, resultPath);
+        // 下载文件
+        // 设置响应头
+        response.setContentType("application/octet-stream;charset=UTF-8");
+        response.setHeader("Content-Disposition", "attachment; filename=" + resultFile.getName());
+        // 写入响应
+        Files.copy(resultFile.toPath(), response.getOutputStream());
+        CompletableFuture.runAsync(() -> {
+            FileUtil.del(tempDirPath);
+        });
     }
 
 }
