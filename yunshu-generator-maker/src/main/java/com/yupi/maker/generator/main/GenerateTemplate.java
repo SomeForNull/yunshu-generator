@@ -15,31 +15,31 @@ import java.io.File;
 import java.io.IOException;
 
 public abstract class GenerateTemplate {
-    public void doGenerate() throws TemplateException, IOException, InterruptedException{
+    public void doGenerate() throws TemplateException, IOException, InterruptedException {
         Meta meta = MetaManager.getMetaObject();
-        System.out.println(meta);
-        //输出的根路径
-        String projectPath=System.getProperty("user.dir");
-        String outputPath=projectPath+ File.separator+"generated"+File.separator+meta.getName();
-        if(!FileUtil.exist(outputPath)){
+        String projectPath = System.getProperty("user.dir");
+        String outputPath = projectPath + File.separator + "generated" + File.separator + meta.getName();
+        doGenerate(meta,outputPath);
+    }
+
+    public void doGenerate(Meta meta, String outputPath) throws TemplateException, IOException, InterruptedException{
+        if (!FileUtil.exist(outputPath)) {
             FileUtil.mkdir(outputPath);
         }
-        //1.从原始文件复制到生成的代码中
-        String sourceCopyPath = copySource(meta, outputPath);
+        // 1、复制原始文件
+        String sourceCopyDestPath = copySource(meta, outputPath);
 
-        //2.生成代码
+        // 2、代码生成
         generateCode(meta, outputPath);
 
+        // 3、构建 jar 包
+        String jarPath = buildJar(meta, outputPath);
 
-        //构建jar包
-         String jarPath=buildJar(meta,outputPath);
-
-        
-        //封装脚本
+        // 4、封装脚本
         String shellOutputFilePath = buildScript(outputPath, jarPath);
 
-        //构建精简版的程序（产物包）
-        buildDist(outputPath, shellOutputFilePath, jarPath,sourceCopyPath);
+        // 5、生成精简版的程序（产物包）
+        buildDist(outputPath, shellOutputFilePath, jarPath, sourceCopyDestPath);
     }
 
     protected String buildDist(String outputPath, String shellOutputFilePath, String jarPath,String sourceCopyPath) {
@@ -88,8 +88,7 @@ public abstract class GenerateTemplate {
 
     protected void generateCode(Meta meta, String outputPath) throws IOException, TemplateException {
         //读取resource目录
-        ClassPathResource classPathResource = new ClassPathResource("");
-        String inputResourcePath = classPathResource.getAbsolutePath();
+        String inputResourcePath ="";
 
         //java包的基础路径
         //com.yupi

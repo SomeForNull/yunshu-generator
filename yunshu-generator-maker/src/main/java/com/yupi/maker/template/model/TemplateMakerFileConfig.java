@@ -1,6 +1,5 @@
 package com.yupi.maker.template.model;
 
-import com.yupi.maker.meta.Meta;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

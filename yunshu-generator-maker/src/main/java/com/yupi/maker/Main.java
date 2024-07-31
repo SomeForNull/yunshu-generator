@@ -1,7 +1,6 @@
 package com.yupi.maker;
 
 import com.yupi.maker.generator.main.GenerateTemplate;
-import com.yupi.maker.generator.main.MainGenerator;
 import com.yupi.maker.generator.main.ZipGenerator;
 import freemarker.template.TemplateException;
 

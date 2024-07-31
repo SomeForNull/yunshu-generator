@@ -8,7 +8,6 @@ import com.yupi.maker.meta.enums.FileGenerateTypeEnum;
 import com.yupi.maker.meta.enums.FileModelTypeEnum;
 import com.yupi.maker.meta.enums.FileTypeEnum;
 
-import java.io.File;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;

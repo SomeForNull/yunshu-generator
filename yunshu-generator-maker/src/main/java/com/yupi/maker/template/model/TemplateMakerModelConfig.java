@@ -1,6 +1,8 @@
 package com.yupi.maker.template.model;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.util.List;
 
 @Data
