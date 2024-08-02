@@ -17,7 +17,7 @@ import {
 } from '@ant-design/pro-components';
 import { ProFormItem } from '@ant-design/pro-form';
 import { history } from '@umijs/max';
-import { message, UploadFile } from 'antd';
+import {message, Row, UploadFile} from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import ModelConfigForm from "@/pages/Generator/Add/components/ModelConfigForm";
 import FileConfigForm from "@/pages/Generator/Add/components/FileConfigForm";
@@ -140,7 +140,7 @@ const GeneratorAddPage: React.FC = () => {
   };
 
   return (
-    <ProCard>
+    <ProCard style={{minWidth:500}}>
       {/* 创建或者已加载要更新的数据时，才渲染表单，顺利填充默认值 */}
       {(!id || oldData) && (
         <StepsForm<API.GeneratorAddRequest | API.GeneratorEditRequest>
@@ -150,19 +150,19 @@ const GeneratorAddPage: React.FC = () => {
           }}
           onFinish={doSubmit}
         >
-          <StepsForm.StepForm name="base" title="基本信息" onFinish={async (values) => {
+          <StepsForm.StepForm  name="base" title="基本信息"  onFinish={async (values) => {
             setBasicInfo(values);
             return true;
           }}>
-            <ProFormText name="name" label="名称" placeholder="请输入名称" />
-            <ProFormTextArea name="description" label="描述" placeholder="请输入描述" />
-            <ProFormText name="basePackage" label="基础包" placeholder="请输入基础包" />
-            <ProFormText name="version" label="版本" placeholder="请输入版本" />
-            <ProFormText name="author" label="作者" placeholder="请输入作者" />
-            <ProFormSelect label="标签" mode="tags" name="tags" placeholder="请输入标签列表" />
-            <ProFormItem label="图片" name="picture">
-              <PictureUploader biz="generator_picture" />
-            </ProFormItem>
+              <ProFormText name="name" label="名称" placeholder="请输入名称"/>
+              <ProFormTextArea name="description" label="描述" placeholder="请输入描述" />
+              <ProFormText name="basePackage" label="基础包" placeholder="请输入基础包" />
+              <ProFormText name="version" label="版本" placeholder="请输入版本" />
+              <ProFormText name="author" label="作者" placeholder="请输入作者" />
+              <ProFormSelect label="标签" mode="tags" name="tags" placeholder="请输入标签列表" />
+              <ProFormItem label="图片" name="picture">
+                <PictureUploader biz="generator_picture" />
+              </ProFormItem>
           </StepsForm.StepForm>
           <StepsForm.StepForm
             name="modelConfig"
