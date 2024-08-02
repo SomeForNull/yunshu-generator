@@ -33,12 +33,6 @@ public interface GeneratorService extends IService<Generator> {
      */
     QueryWrapper<Generator> getQueryWrapper(GeneratorQueryRequest generatorQueryRequest);
 
-    /**
-     * 从 ES 查询
-     *
-     * @param generatorQueryRequest
-     * @return
-     */
 
 
     /**

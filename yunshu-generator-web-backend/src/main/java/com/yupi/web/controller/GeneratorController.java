@@ -6,6 +6,7 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.qcloud.cos.model.COSObject;
 import com.qcloud.cos.model.COSObjectInputStream;
@@ -31,6 +32,7 @@ import com.yupi.web.service.GeneratorService;
 import com.yupi.web.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -203,9 +205,25 @@ public class GeneratorController {
         long size = generatorQueryRequest.getPageSize();
         // 限制爬虫
         ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
-        Page<Generator> generatorPage = generatorService.page(new Page<>(current, size),
-                generatorService.getQueryWrapper(generatorQueryRequest));
-        return ResultUtils.success(generatorService.getGeneratorVOPage(generatorPage, request));
+        QueryWrapper<Generator> queryWrapper = generatorService.getQueryWrapper(generatorQueryRequest);
+        //sql优化
+        queryWrapper.select("id","name","description","tags","picture","status","userId","createTime","updateTime");
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        Page<Generator> generatorPage = generatorService.page(new Page<>(current, size),queryWrapper);
+        stopWatch.stop();
+        System.out.println("生成器查询耗时："+stopWatch.getTotalTimeMillis());
+        stopWatch = new StopWatch();
+        stopWatch.start();
+        Page<GeneratorVO> generatorVOPage = generatorService.getGeneratorVOPage(generatorPage, request);
+        stopWatch.stop();
+        System.out.println("用户查询耗时："+stopWatch.getTotalTimeMillis());
+        //数据精简
+        generatorVOPage.getRecords().stream().forEach(item -> {
+            item.setModelConfig(null);
+            item.setFileConfig(null);
+        });
+        return ResultUtils.success(generatorVOPage);
     }
 
     /**
