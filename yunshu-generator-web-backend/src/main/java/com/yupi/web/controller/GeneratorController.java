@@ -409,18 +409,24 @@ public class GeneratorController {
         // 工作空间
         String projectPath = System.getProperty("user.dir");
         String tempDirPath = String.format("%s/.temp/use/%s", projectPath, id);
+        //是否有缓存
+        String cacheFilePath = getCacheFilePath(id, distPath);
+        String zipFilePath=cacheFilePath;
+        //如果没有缓存则从cos下载
+        if(!FileUtil.exist(cacheFilePath)){
+            zipFilePath = tempDirPath + "/dist.zip";
+            // 新建文件
+            if (!FileUtil.exist(zipFilePath)) {
+                FileUtil.touch(zipFilePath);
+            }
+            // 下载文件
+            try {
+                cosManager.download(distPath, zipFilePath);
+            } catch (InterruptedException e) {
+                throw new BusinessException(ErrorCode.SYSTEM_ERROR, "生成器下载失败");
+            }
+        }
 
-        String zipFilePath = tempDirPath + "/dist.zip";
-        // 新建文件
-        if (!FileUtil.exist(zipFilePath)) {
-            FileUtil.touch(zipFilePath);
-        }
-        // 下载文件
-        try {
-            cosManager.download(distPath, zipFilePath);
-        } catch (InterruptedException e) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "生成器下载失败");
-        }
         //解压
         File unzipDistDir = ZipUtil.unzip(zipFilePath);
         //将用户输入的参数写入到 JSON 文件中
