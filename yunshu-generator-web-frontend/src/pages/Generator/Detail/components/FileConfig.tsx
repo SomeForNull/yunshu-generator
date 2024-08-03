@@ -18,28 +18,7 @@ const FileConfig: React.FC<Props> = (props) => {
     return <></>;
   }
 
-  const items: DescriptionsProps['items'] = [
-    {
-      key: 'inputRootPath',
-      label: '输入根路径',
-      children: <p>{fileConfig.inputRootPath}</p>,
-    },
-    {
-      key: 'outputRootPath',
-      label: '输出根路径',
-      children: <p>{fileConfig.outputRootPath}</p>,
-    },
-    {
-      key: 'sourceRootPath',
-      label: '项目根路径',
-      children: <p>{fileConfig.sourceRootPath}</p>,
-    },
-    {
-      key: 'type',
-      label: '文件类别',
-      children: <p>{fileConfig.type}</p>,
-    },
-  ];
+
 
   const fileListView = (files?: API.FileInfo[]) => {
     if (!files) {
@@ -120,15 +99,6 @@ const FileConfig: React.FC<Props> = (props) => {
 
   return (
     <div>
-      <Descriptions
-        title={
-          <>
-            <InfoCircleOutlined /> 基本信息
-          </>
-        }
-        column={2}
-        items={items}
-      />
       <div style={{ marginBottom: 16 }} />
       <Descriptions
         title={

@@ -1,5 +1,6 @@
 package com.yupi.web.controller;
 
+import cn.hutool.core.codec.Base64Encoder;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
@@ -8,11 +9,13 @@ import cn.hutool.core.util.ZipUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.gson.reflect.TypeToken;
 import com.qcloud.cos.model.COSObject;
 import com.qcloud.cos.model.COSObjectInputStream;
 import com.qcloud.cos.utils.IOUtils;
 import com.yupi.maker.generator.main.GenerateTemplate;
 import com.yupi.maker.generator.main.ZipGenerator;
+import com.yupi.maker.meta.Meta;
 import com.yupi.maker.meta.MetaValidator;
 import com.yupi.web.annotation.AuthCheck;
 import com.yupi.web.common.BaseResponse;
@@ -23,7 +26,6 @@ import com.yupi.web.constant.UserConstant;
 import com.yupi.web.exception.BusinessException;
 import com.yupi.web.exception.ThrowUtils;
 import com.yupi.web.manager.CosManager;
-import com.yupi.maker.meta.Meta;
 import com.yupi.web.model.dto.generator.*;
 import com.yupi.web.model.entity.Generator;
 import com.yupi.web.model.entity.User;
@@ -32,7 +34,7 @@ import com.yupi.web.service.GeneratorService;
 import com.yupi.web.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.util.StopWatch;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -47,6 +49,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 帖子接口
@@ -67,7 +70,8 @@ public class GeneratorController {
     @Resource
     private CosManager cosManager;
 
-
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
     // region 增删改查
 
     /**
@@ -205,24 +209,26 @@ public class GeneratorController {
         long size = generatorQueryRequest.getPageSize();
         // 限制爬虫
         ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
+        //检查是否有redis缓存
+        String cacheKey = getPageCacheKey(generatorQueryRequest);
+        String jsonData= stringRedisTemplate.opsForValue().get(cacheKey);
+        if(StrUtil.isNotBlank(jsonData)){
+            return ResultUtils.success(JSONUtil.toBean(jsonData, new TypeToken<Page<GeneratorVO>>() {}.getType(),true));
+        }
         QueryWrapper<Generator> queryWrapper = generatorService.getQueryWrapper(generatorQueryRequest);
         //sql优化
         queryWrapper.select("id","name","description","tags","picture","status","userId","createTime","updateTime");
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
+
         Page<Generator> generatorPage = generatorService.page(new Page<>(current, size),queryWrapper);
-        stopWatch.stop();
-        System.out.println("生成器查询耗时："+stopWatch.getTotalTimeMillis());
-        stopWatch = new StopWatch();
-        stopWatch.start();
+
         Page<GeneratorVO> generatorVOPage = generatorService.getGeneratorVOPage(generatorPage, request);
-        stopWatch.stop();
-        System.out.println("用户查询耗时："+stopWatch.getTotalTimeMillis());
+
         //数据精简
         generatorVOPage.getRecords().stream().forEach(item -> {
             item.setModelConfig(null);
             item.setFileConfig(null);
         });
+        stringRedisTemplate.opsForValue().set(cacheKey,JSONUtil.toJsonStr(generatorVOPage),100, TimeUnit.MINUTES);
         return ResultUtils.success(generatorVOPage);
     }
 
@@ -572,6 +578,17 @@ public class GeneratorController {
         CompletableFuture.runAsync(() -> {
             FileUtil.del(tempDirPath);
         });
+    }
+/**
+ * 获取分页缓存 key
+ * @param generatorQueryRequest
+ * @return
+ */
+    private static String getPageCacheKey(GeneratorQueryRequest generatorQueryRequest) {
+        String jsonStr = JSONUtil.toJsonStr(generatorQueryRequest);
+        String base64 = Base64Encoder.encode(jsonStr);
+        String key = "generator:page:" + base64;
+        return key;
     }
 
 }

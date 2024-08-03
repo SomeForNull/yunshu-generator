@@ -2,7 +2,7 @@ import {
   getGeneratorVoByIdUsingGet,
   useGeneratorUsingPost,
 } from '@/services/backend/generatorController';
-import { useModel, useParams } from '@@/exports';
+import { useModel, useParams} from '@@/exports';
 import { DownloadOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import {
@@ -75,20 +75,24 @@ const GeneratorUsePage: React.FC = () => {
       onClick={async () => {
         setDownloading(true);
         const values = form.getFieldsValue();
+        try {
+          // eslint-disable-next-line react-hooks/rules-of-hooks
+          const blob = await useGeneratorUsingPost(
+            {
+              id: data.id,
+              dataModel: values,
+            },
+            {
+              responseType: 'blob',
+            },
+          );
+            // 使用 file-saver 来保存文件
+            const fullPath = data.distPath || '';
+            saveAs(blob, fullPath.substring(fullPath.lastIndexOf('/') + 1));
+        } catch (error: any) {
+          message.error('生成失败，' + error.message);
+        }
 
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        const blob = await useGeneratorUsingPost(
-          {
-            id: data.id,
-            dataModel: values,
-          },
-          {
-            responseType: 'blob',
-          },
-        );
-        // 使用 file-saver 来保存文件
-        const fullPath = data.distPath || '';
-        saveAs(blob, fullPath.substring(fullPath.lastIndexOf('/') + 1));
         setDownloading(false);
       }}
     >
