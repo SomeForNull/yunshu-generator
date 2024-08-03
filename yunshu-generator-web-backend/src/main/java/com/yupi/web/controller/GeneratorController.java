@@ -25,6 +25,7 @@ import com.yupi.web.common.ResultUtils;
 import com.yupi.web.constant.UserConstant;
 import com.yupi.web.exception.BusinessException;
 import com.yupi.web.exception.ThrowUtils;
+import com.yupi.web.manager.CacheManager;
 import com.yupi.web.manager.CosManager;
 import com.yupi.web.model.dto.generator.*;
 import com.yupi.web.model.entity.Generator;
@@ -34,7 +35,6 @@ import com.yupi.web.service.GeneratorService;
 import com.yupi.web.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -49,7 +49,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 帖子接口
@@ -71,7 +70,7 @@ public class GeneratorController {
     private CosManager cosManager;
 
     @Resource
-    private StringRedisTemplate stringRedisTemplate;
+    private CacheManager cacheManager;
     // region 增删改查
 
     /**
@@ -211,24 +210,17 @@ public class GeneratorController {
         ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
         //检查是否有redis缓存
         String cacheKey = getPageCacheKey(generatorQueryRequest);
-        String jsonData= stringRedisTemplate.opsForValue().get(cacheKey);
-        if(StrUtil.isNotBlank(jsonData)){
-            return ResultUtils.success(JSONUtil.toBean(jsonData, new TypeToken<Page<GeneratorVO>>() {}.getType(),true));
+        Object cacheValue= cacheManager.get(cacheKey);
+        if(cacheValue!=null){
+            return ResultUtils.success((Page<GeneratorVO>) cacheValue);
         }
         QueryWrapper<Generator> queryWrapper = generatorService.getQueryWrapper(generatorQueryRequest);
         //sql优化
         queryWrapper.select("id","name","description","tags","picture","status","userId","createTime","updateTime");
 
         Page<Generator> generatorPage = generatorService.page(new Page<>(current, size),queryWrapper);
-
         Page<GeneratorVO> generatorVOPage = generatorService.getGeneratorVOPage(generatorPage, request);
-
-        //数据精简
-        generatorVOPage.getRecords().stream().forEach(item -> {
-            item.setModelConfig(null);
-            item.setFileConfig(null);
-        });
-        stringRedisTemplate.opsForValue().set(cacheKey,JSONUtil.toJsonStr(generatorVOPage),100, TimeUnit.MINUTES);
+        cacheManager.put(cacheKey,generatorVOPage);
         return ResultUtils.success(generatorVOPage);
     }
 
