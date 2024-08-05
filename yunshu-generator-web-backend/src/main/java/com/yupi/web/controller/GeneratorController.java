@@ -576,7 +576,7 @@ public class GeneratorController {
  * @param generatorQueryRequest
  * @return
  */
-    private static String getPageCacheKey(GeneratorQueryRequest generatorQueryRequest) {
+    public static String getPageCacheKey(GeneratorQueryRequest generatorQueryRequest) {
         String jsonStr = JSONUtil.toJsonStr(generatorQueryRequest);
         String base64 = Base64Encoder.encode(jsonStr);
         String key = "generator:page:" + base64;
