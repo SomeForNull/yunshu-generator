@@ -5,6 +5,7 @@
 yunshu-generator.iml
 yunshu-generator-basic.iml
 application-local.yml
+application-prod.yml
 out
 generated
 ### Java template

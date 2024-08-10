@@ -50,8 +50,9 @@ export default (props: Props) => {
         return (
           <div style={{ display: 'flex', rowGap: 16, flexDirection: 'column' }}>
             {fields.map((field) => {
-              const modelConfig =
+              let modelConfig =
                 formRef?.current?.getFieldsValue()?.modelConfig ?? oldData?.modelConfig;
+                modelConfig=modelConfig??{};
               const groupKey = modelConfig.models?.[field.name]?.groupKey;
 
               return (

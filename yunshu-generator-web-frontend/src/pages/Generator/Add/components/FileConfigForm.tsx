@@ -69,8 +69,9 @@ export default (props: Props) => {
           return (
             <div style={{ display: 'flex', rowGap: 16, flexDirection: 'column' }}>
               {fields.map((field) => {
-                const fileConfig =
+                let fileConfig =
                   formRef?.current?.getFieldsValue()?.fileConfig ?? oldData?.fileConfig;
+                fileConfig=fileConfig??{};
                 const groupKey = fileConfig.files?.[field.name]?.groupKey;
 
                 return (

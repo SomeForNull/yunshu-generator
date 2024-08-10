@@ -107,17 +107,9 @@ public class CosManager {
     public void deleteObject(String key) throws CosClientException, CosServiceException {
         cosClient.deleteObject(cosClientConfig.getBucket(), key);
     }
-    /**
-     * 批量删除对象
-     *
-     * @param keyList
-     * @return
-     * @throws MultiObjectDeleteException
-     * @throws CosClientException
-     * @throws CosServiceException
-     */
-    public DeleteObjectsResult deleteObjects(List<String> keyList)
-            throws MultiObjectDeleteException, CosClientException, CosServiceException {
+
+    // 批量删除文件(不带版本号, 即bucket未开启多版本)
+    public void deleteObjects(List<String> keyList) {
         DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest(cosClientConfig.getBucket());
         // 设置要删除的key列表, 最多一次删除1000个
         ArrayList<DeleteObjectsRequest.KeyVersion> keyVersions = new ArrayList<>();
@@ -128,8 +120,18 @@ public class CosManager {
             keyVersions.add(new DeleteObjectsRequest.KeyVersion(key));
         }
         deleteObjectsRequest.setKeys(keyVersions);
-        DeleteObjectsResult deleteObjectsResult = cosClient.deleteObjects(deleteObjectsRequest);
-        return deleteObjectsResult;
+        // 批量删除文件
+        try {
+            DeleteObjectsResult deleteObjectsResult = cosClient.deleteObjects(deleteObjectsRequest);
+            List<DeleteObjectsResult.DeletedObject> deleteObjectResultArray = deleteObjectsResult.getDeletedObjects();
+        } catch (MultiObjectDeleteException mde) { // 如果部分产出成功部分失败, 返回MultiObjectDeleteException
+            List<DeleteObjectsResult.DeletedObject> deleteObjects = mde.getDeletedObjects();
+            List<MultiObjectDeleteException.DeleteError> deleteErrors = mde.getErrors();
+        } catch (CosServiceException e) { // 如果是其他错误, 比如参数错误， 身份验证不过等会抛出CosServiceException
+            e.printStackTrace();
+        } catch (CosClientException e) { // 如果是客户端错误，比如连接不上COS
+            e.printStackTrace();
+        }
     }
     /**
      * 删除目录
