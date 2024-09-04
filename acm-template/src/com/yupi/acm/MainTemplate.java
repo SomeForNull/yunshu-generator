@@ -3,7 +3,7 @@ package com.yupi.acm;
 import java.util.Scanner;
 
 /**
- * ACM ÊäÈëÄ£°å£¨¶àÊıÖ®ºÍ£©
+ * ACM
  * @author yunshu
  */
 public class MainTemplate {
@@ -11,17 +11,17 @@ public class MainTemplate {
         Scanner scanner = new Scanner(System.in);
     while (scanner.hasNext()) {
 
-            // ¶ÁÈ¡ÊäÈëÔªËØ¸öÊı
+            // ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½Ôªï¿½Ø¸ï¿½ï¿½ï¿½
             int n = scanner.nextInt();
 
-            // ¶ÁÈ¡Êı×é
+            // ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½
             int[] arr = new int[n];
             for (int i = 0; i < n; i++) {
                 arr[i] = scanner.nextInt();
             }
 
-            // ´¦ÀíÎÊÌâÂß¼­£¬¸ù¾İĞèÒª½øĞĞÊä³ö
-            // Ê¾Àı£º¼ÆËãÊı×éÔªËØµÄºÍ
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+            // Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ôªï¿½ØµÄºï¿½
             int sum = 0;
             for (int num : arr) {
                 sum += num;
